@@ -71,12 +71,14 @@ public class AnnotationE extends Annotation {
 	 */
 	@Override
 	public String toString() {
+		int tempTF = this.frequency != null ? this.frequency : -1;
+		double tempIDF = this.idf != null ? this.idf : -1;
 		return "[\\'" + this.getId() + "\\'" +
 			"; \\'" + this.getNodeId() + "\\'" +
 			"; \\'" + this.getBodies() + "\\'" +
 			"; \\'" + this.getTopics() + "\\'" +
-			"; \\'" + this.getFrequency().intValue() + "\\'" + 
-			"; \\'" + this.getIDF().doubleValue()  + "\\'" + "]\n";
+			"; \\'" + tempTF + "\\'" + 
+			"; \\'" + tempIDF  + "\\'" + "]\n";
 	}
 
 	/* (non-Javadoc)

@@ -16,7 +16,7 @@ public class ElementSelector extends Selector{
 	}
 	@Override
 	public String getSelector() {
-		return text;
+		return text == null ? "" : text;
 	}
 	@Override
 	public void setSelector(String str) {
