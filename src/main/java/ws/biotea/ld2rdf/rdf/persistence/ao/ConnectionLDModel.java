@@ -158,5 +158,12 @@ public class ConnectionLDModel {
 	public Model getLDJenaModel() {
 		return ldModel;
 	}
+
+	/**
+	 * @param fileName the fileName to set
+	 */
+	public void setFileName(String fileName) {
+		this.fileName = fileName;
+	}
 	
 }
