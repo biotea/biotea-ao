@@ -19,14 +19,15 @@ import com.hp.hpl.jena.rdf.model.Resource;
 import com.hp.hpl.jena.rdf.model.Statement;
 
 import edu.stanford.smi.protege.exception.OntologyLoadException;
+import ws.biotea.ld2rdf.rdf.model.BaseAnnotation;
 import ws.biotea.ld2rdf.rdf.model.ao.Annotation;
 import ws.biotea.ld2rdf.rdf.model.ao.FoafAgent;
 import ws.biotea.ld2rdf.rdf.model.ao.FoafDocument;
 import ws.biotea.ld2rdf.rdf.model.ao.Topic;
 import ws.biotea.ld2rdf.rdf.model.aoextended.AnnotationE;
-import ws.biotea.ld2rdf.rdf.persistence.ao.AnnotationDAO;
+import ws.biotea.ld2rdf.rdf.persistence.AnnotationDAO;
 import ws.biotea.ld2rdf.rdf.persistence.ao.AnnotationOWLDAO;
-import ws.biotea.ld2rdf.rdf.persistence.ao.ConnectionLDModel;
+import ws.biotea.ld2rdf.rdf.persistence.ConnectionLDModel;
 import ws.biotea.ld2rdf.util.ResourceConfig;
 import ws.biotea.ld2rdf.util.Conversion;
 import ws.biotea.ld2rdf.util.annotation.AnnotationResourceConfig;
@@ -85,10 +86,10 @@ public class TestAnnotationOWLDAO {
 
 			URI uri = dao.insertAnnotation("http://base.com/", "http://biotea.ws/annotation/pmc_resource/123/", annot, null, model, true);
 			assertNull("Blank nodes should have null URIs", uri);
-			assertEquals("Annotation id should be part od node id", "Annotation_" + annot.getId(), annot.getNodeId());
+			assertEquals("OpenAnnotation id should be part od node id", "Annotation_" + annot.getId(), annot.getNodeId());
 
 			Resource resource = model.getResource(annot.getNodeId());
-			assertEquals("Annotation is should be part of resource URI", "Annotation_" + annot.getId(), resource.getURI().toString());
+			assertEquals("OpenAnnotation is should be part of resource URI", "Annotation_" + annot.getId(), resource.getURI().toString());
 			assertEquals("Node id should be equal to URI", annot.getNodeId(), resource.getURI().toString());
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -104,10 +105,10 @@ public class TestAnnotationOWLDAO {
 			URI uri = dao.insertAnnotation("http://base.com/", "http://biotea.ws/annotation/pmc_resource/123/", annot, null, model, false);
 			assertNotNull("Regular nodes should not have null URIs", uri);
 			assertNull("Node id for regular nodes should be null", annot.getNodeId());
-			assertEquals("Annotation URI should be returned", annot.getUri(), uri);
+			assertEquals("OpenAnnotation URI should be returned", annot.getUri(), uri);
 			
 			Resource resource = model.getResource(annot.getUri().toString());
-			assertTrue("Annotation id should be the last part of resource URI", resource.getURI().toString().endsWith(annot.getId()));
+			assertTrue("OpenAnnotation id should be the last part of resource URI", resource.getURI().toString().endsWith(annot.getId()));
 		} catch (Exception e) {
 			e.printStackTrace();
 			fail("No exception is expected here");
@@ -120,10 +121,10 @@ public class TestAnnotationOWLDAO {
 			AnnotationDAO dao = new AnnotationOWLDAO();	
 
 			URI uri = dao.insertAnnotation("http://base.com/", "http://biotea.ws/annotation/pmc_resource/123/", annot, "annot_id", model, false);
-			assertEquals("Annotation URI should be returned", annot.getUri(), uri);
+			assertEquals("OpenAnnotation URI should be returned", annot.getUri(), uri);
 			
 			Resource resource = model.getResource(annot.getUri().toString());
-			assertTrue("Annotation id should be the last part of resource URI", resource.getURI().toString().endsWith(annot.getId()));
+			assertTrue("OpenAnnotation id should be the last part of resource URI", resource.getURI().toString().endsWith(annot.getId()));
 		} catch (Exception e) {
 			e.printStackTrace();
 			fail("No exception is expected here");
@@ -137,10 +138,10 @@ public class TestAnnotationOWLDAO {
 
 			annot.setId("id");
 			URI uri = dao.insertAnnotation("http://base.com/", "http://biotea.ws/annotation/pmc_resource/123/", annot, null, model, false);
-			assertEquals("Annotation URI should be returned", annot.getUri(), uri);
+			assertEquals("OpenAnnotation URI should be returned", annot.getUri(), uri);
 			
 			Resource resource = model.getResource(annot.getUri().toString());
-			assertTrue("Annotation id should be the last part of resource URI", resource.getURI().toString().endsWith(annot.getId()));
+			assertTrue("OpenAnnotation id should be the last part of resource URI", resource.getURI().toString().endsWith(annot.getId()));
 		} catch (Exception e) {
 			e.printStackTrace();
 			fail("No exception is expected here");
@@ -154,11 +155,11 @@ public class TestAnnotationOWLDAO {
 
 			annot.setId("id");
 			URI uri = dao.insertAnnotation("http://base.com/", "http://biotea.ws/annotation/pmc_resource/123/", annot, "annot_id", model, false);
-			assertEquals("Annotation URI should be returned", annot.getUri(), uri);
+			assertEquals("OpenAnnotation URI should be returned", annot.getUri(), uri);
 			
 			Resource resource = model.getResource(annot.getUri().toString());
-			assertTrue("Annotation id should be the last part of resource URI", resource.getURI().toString().endsWith(annot.getId()));
-			assertEquals("Annotation id should have changed", "annot_id", annot.getId());
+			assertTrue("OpenAnnotation id should be the last part of resource URI", resource.getURI().toString().endsWith(annot.getId()));
+			assertEquals("OpenAnnotation id should have changed", "annot_id", annot.getId());
 		} catch (Exception e) {
 			e.printStackTrace();
 			fail("No exception is expected here");
@@ -170,7 +171,7 @@ public class TestAnnotationOWLDAO {
 		Property opType = model.getProperty(ResourceConfig.OP_RDF_TYPE);
 		Property dpBody = model.getProperty(Annotation.ANNOTATION_DP_BODY);
 		Property opHasTopic = model.getProperty(Annotation.ANNOTATION_OP_HAS_TOPIC);
-		Property opSameAs = model.getProperty(Annotation.OWL_SAME_AS);
+		Property opSameAs = model.getProperty(BaseAnnotation.OWL_SAME_AS);
 		Property opAnnotatesResource = model.getProperty(Annotation.ANNOTATION_OP_ANNOTATES_RESOURCE);
 		Property dpCreatedOn = model.getProperty(Annotation.ANNOTATION_DP_CREATED_ON);
 		Property opCreatedBy = model.getProperty(Annotation.ANNOTATION_OP_CREATED_BY);
@@ -184,13 +185,13 @@ public class TestAnnotationOWLDAO {
 			Resource resource = model.getResource(uri.toString());
 			
 			Resource range = resource.getPropertyResourceValue(opType);
-			assertEquals("Annotation class", Annotation.ANNOTATION_CLASS, range.toString());
+			assertEquals("OpenAnnotation class", Annotation.ANNOTATION_CLASS, range.toString());
 			
 			Statement statement = resource.getProperty(dpBody); 
-			assertTrue("Annotation body", statement.getObject().asLiteral().getString().startsWith(annot.getBodies().iterator().next()));
+			assertTrue("OpenAnnotation body", statement.getObject().asLiteral().getString().startsWith(annot.getBodies().iterator().next()));
 			
 			range = resource.getPropertyResourceValue(opHasTopic);
-			assertEquals("Annotation topic", topic.getURL().toString(), range.toString());
+			assertEquals("OpenAnnotation topic", topic.getURL().toString(), range.toString());
 			
 			if (ResourceConfig.withBio()) {
 				Resource topicRes = model.getResource(topic.getURL().toString());				
@@ -210,15 +211,15 @@ public class TestAnnotationOWLDAO {
 			assertEquals("Annotated document", document.getUri().toString(), range.toString());
 			
 			range = resource.getPropertyResourceValue(opCreatedBy);
-			assertEquals("Annotation created by", creator.getUri().toString(), range.toString());
+			assertEquals("OpenAnnotation created by", creator.getUri().toString(), range.toString());
 			
 			range = resource.getPropertyResourceValue(opAuthoredBy);
-			assertEquals("Annotation authored by", author.getUri().toString(), range.toString());
+			assertEquals("OpenAnnotation authored by", author.getUri().toString(), range.toString());
 			
 			statement = resource.getProperty(dpCreatedOn);
 			statement.getObject().asLiteral().getValue().toString();
 			String inModel = Conversion.calendarToString(Conversion.xsdDateTimeToCalendar(statement.getObject().asLiteral().getValue().toString()));
-			assertEquals("Annotation creation date", annot.getCreationDateAsString(), inModel);
+			assertEquals("OpenAnnotation creation date", annot.getCreationDateAsString(), inModel);
 		} catch (Exception e) {
 			e.printStackTrace();
 			fail("No exception is expected here");

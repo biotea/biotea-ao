@@ -1,4 +1,4 @@
-package ws.biotea.ld2rdf.rdf.persistence.ao;
+package ws.biotea.ld2rdf.rdf.persistence;
 
 import java.util.ResourceBundle;
 
@@ -9,8 +9,8 @@ import com.hp.hpl.jena.vocabulary.*;
 /**
  * El driver se baja de donde diga Google ("com.mysql.jdbc.driver jar") --> Site
  * de MySQL El driver es un jar que hay que poner en el classpath En este
- * ejemplo, el esquema de la BD hay que hacerlo nuevo (vacío) en cada
- * invocación.
+ * ejemplo, el esquema de la BD hay que hacerlo nuevo (vacï¿½o) en cada
+ * invocaciï¿½n.
  */
 public class Jena2ModelOnDBCreate {
 	/**

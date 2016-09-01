@@ -1,7 +1,6 @@
 package ws.biotea.ld2rdf.rdf.model.ao;
 
 import ws.biotea.ld2rdf.util.Conversion;
-import ws.biotea.ld2rdf.util.OntologyPrefix;
 import ws.biotea.ld2rdf.util.annotation.AnnotationOntologyPrefix;
 
 import java.io.Serializable;
@@ -15,7 +14,7 @@ import java.util.Vector;
 
 
 /**
- * Annotation: This class represents a general annotation on a Document.
+ * OpenAnnotation: This class represents a general annotation on a Document.
  * @author leylajael
  */
 public class Annotation implements Serializable {
@@ -70,7 +69,7 @@ public class Annotation implements Serializable {
 	private FoafAgent author;
 	
 	/* OWL Descriptors */
-	public final static String ANNOTATION_CLASS = AnnotationOntologyPrefix.AO_CORE.getURL() + "Annotation";
+	public final static String ANNOTATION_CLASS = AnnotationOntologyPrefix.AO_CORE.getURL() + "OpenAnnotation";
 	public final static String ANNOTATION_DP_BODY = AnnotationOntologyPrefix.AO_CORE.getURL() + "body"; //TODO OP?
 	public final static String ANNOTATION_OP_CONTEXT = AnnotationOntologyPrefix.AO_CORE.getURL() + "context";
 	public final static String ANNOTATION_OP_HAS_TOPIC = AnnotationOntologyPrefix.AO_CORE.getURL() + "hasTopic";
@@ -78,17 +77,8 @@ public class Annotation implements Serializable {
 	public final static String ANNOTATION_DP_CREATED_ON = AnnotationOntologyPrefix.PAV.getURL() + "createdOn"; //TODO: OP?
 	public final static String ANNOTATION_OP_CREATED_BY = AnnotationOntologyPrefix.PAV.getURL() + "createdBy";
 	public final static String ANNOTATION_OP_AUTHORED_BY = AnnotationOntologyPrefix.PAV.getURL() + "authoredBy";
-	public final static String ANNOTATION_DP_LABEL = OntologyPrefix.RDFS.getURL() + "label";
 	public final static String ANNOTATION_ID = "Annotation_";
 	public final static String ANNOTATION_TYPE = "Annotation";
-	public final static String RDFS_COMMENT = OntologyPrefix.RDFS.getURL() + "comment";
-	public final static String BIOTEA_OCURRENCES = OntologyPrefix.BIOTEA.getURL() + "tf";
-	public final static String BIOTEA_IDF = OntologyPrefix.BIOTEA.getURL() + "idf";
-	public final static String RDFS_SEE_ALSO = OntologyPrefix.RDFS.getURL() + "seeAlso";
-	public final static String OWL_SAME_AS = OntologyPrefix.OWL.getURL() + "sameAs";
-    public final static String DC_IS_REFERENCED_BY = OntologyPrefix.DCTERMS.getURL() + "isReferencedBy";
-    public final static String VOID_IN_DATASET = OntologyPrefix.VOID.getURL() + "inDataset"; 
-    public final static String DP_SCORE = OntologyPrefix.BIOTEA.getURL() + "score"; 
 
 	/**
 	 * Returns the uri.
@@ -361,8 +351,7 @@ public class Annotation implements Serializable {
 				return false;
 		} else if (!document.getUri().equals(other.document.getUri()))
 			return false;
-		
-		
+				
 		if (topics == null) {
 			if (other.topics != null)
 				return false;

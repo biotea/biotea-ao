@@ -1,4 +1,4 @@
-package ws.biotea.ld2rdf.rdf.persistence.ao;
+package ws.biotea.ld2rdf.rdf.persistence;
 
 import java.util.ResourceBundle;
 
@@ -8,7 +8,7 @@ import com.hp.hpl.jena.db.ModelRDB;
 
 
 /**
- * Continuación de Jena2ModelOnDBCreate 
+ * Continuaciï¿½n de Jena2ModelOnDBCreate 
  */
 public class Jena2ModelOnDBRead {
 	/**

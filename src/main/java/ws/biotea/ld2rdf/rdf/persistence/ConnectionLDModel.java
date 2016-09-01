@@ -1,9 +1,11 @@
-package ws.biotea.ld2rdf.rdf.persistence.ao;
+package ws.biotea.ld2rdf.rdf.persistence;
 
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 
 import org.apache.jena.riot.RDFFormat;
@@ -22,7 +24,7 @@ public class ConnectionLDModel {
 	private Model ldModel;
 	//private Model ldOWLModel;
 	private String fileName;
-	public static Map<String, String> prefixes = OntologyPrefix.mergePrefixes(OntologyPrefix.prefixesMap_RDF(), AnnotationOntologyPrefix.prefixesMap_AO());
+	private Map<String, String> prefixes;
 	
 	/**
 	 * @throws ClassNotFoundException 
@@ -30,6 +32,15 @@ public class ConnectionLDModel {
 	 * 
 	 */
 	public ConnectionLDModel() {
+		List<Map<String, String>> lst = new ArrayList<Map<String, String>>();
+		lst.add(OntologyPrefix.prefixesMap_RDF());
+		lst.add(AnnotationOntologyPrefix.prefixesMap_AO());
+		lst.add(AnnotationOntologyPrefix.prefixesMap_OA());
+		this.prefixes = OntologyPrefix.mergePrefixes(lst);
+	}
+	
+	public ConnectionLDModel(List<Map<String, String>> lst) {
+		this.prefixes = OntologyPrefix.mergePrefixes(lst);
 	}
 	
 	/**

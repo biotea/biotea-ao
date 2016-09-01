@@ -1,7 +1,7 @@
 /**
  * 
  */
-package ws.biotea.ld2rdf.rdf.persistence.ao;
+package ws.biotea.ld2rdf.rdf.persistence.oa;
 
 import com.hp.hpl.jena.datatypes.xsd.XSDDatatype;
 import com.hp.hpl.jena.rdf.model.AnonId;
@@ -18,14 +18,12 @@ import ws.biotea.ld2rdf.exception.RDFModelIOException;
 import ws.biotea.ld2rdf.rdf.model.BaseAnnotation;
 import ws.biotea.ld2rdf.rdf.model.ao.Annotation;
 import ws.biotea.ld2rdf.rdf.model.ao.ElementSelector;
-import ws.biotea.ld2rdf.rdf.model.ao.OffsetRangeTextSelector;
 import ws.biotea.ld2rdf.rdf.model.ao.Selector;
-import ws.biotea.ld2rdf.rdf.model.ao.StartEndElementSelector;
 import ws.biotea.ld2rdf.rdf.model.aoextended.AnnotationE;
+import ws.biotea.ld2rdf.rdf.model.oa.OpenAnnotation;
 import ws.biotea.ld2rdf.rdf.persistence.AnnotationDAO;
 import ws.biotea.ld2rdf.rdf.persistence.ConnectionLDModel;
 import ws.biotea.ld2rdf.util.annotation.AnnotationClassesAndProperties;
-import ws.biotea.ld2rdf.util.annotation.AnnotationResourceConfig;
 import ws.biotea.ld2rdf.util.ResourceConfig;
 import ws.biotea.ld2rdf.util.annotation.AnnotationOntologyPrefix;
 import ws.biotea.ld2rdf.util.GenerateMD5;
@@ -43,17 +41,17 @@ import java.util.Map;
  * @author leylajael
  *
  */
-public class AnnotationOWLDAO implements AnnotationDAO {
+public class AnnotationOWLOA implements AnnotationDAO {
 	Logger logger = Logger.getLogger(this.getClass());
 	private List<Map<String, String>> prefixes;
 	
 	/**
 	 * Constructor.
 	 */
-	public AnnotationOWLDAO() {
+	public AnnotationOWLOA() {
 		prefixes = new ArrayList<Map<String, String>>();
 		prefixes.add(OntologyPrefix.prefixesMap_RDF());
-		prefixes.add(AnnotationOntologyPrefix.prefixesMap_AO());
+		prefixes.add(AnnotationOntologyPrefix.prefixesMap_OA());
 	}
 	/**
 	 * Adds an annotation to the model.
@@ -142,13 +140,16 @@ public class AnnotationOWLDAO implements AnnotationDAO {
 		//OntClass annotationClass = model.getOntClass(OpenAnnotation.ANNOTATION_CLASS);
 		Property opType = model.getProperty(ResourceConfig.OP_RDF_TYPE);
 		Property opHasSTY = model.getProperty(AnnotationClassesAndProperties.UMLS_HAS_STY.getURLValue());
-		Property dpBody = model.getProperty(Annotation.ANNOTATION_DP_BODY);
-		Property opContext = model.getProperty(Annotation.ANNOTATION_OP_CONTEXT);
-		Property opHasTopic = model.getProperty(Annotation.ANNOTATION_OP_HAS_TOPIC);
-		Property opAnnotatesResource = model.getProperty(Annotation.ANNOTATION_OP_ANNOTATES_RESOURCE);
+		
+		Property opBody = model.getProperty(OpenAnnotation.ANNOTATION_OP_BODY);	
+		Property opRDFValue = model.getProperty(OpenAnnotation.ANNOTATION_OP_VALUE);
+		Property opHasTarget = model.getProperty(OpenAnnotation.ANNOTATION_OP_TARGET);
+		Property opHasSource = model.getProperty(OpenAnnotation.ANNOTATION_OP_SOURCE);
+		
 		Property dpCreatedOn = model.getProperty(Annotation.ANNOTATION_DP_CREATED_ON);
 		Property opCreatedBy = model.getProperty(Annotation.ANNOTATION_OP_CREATED_BY);
 		Property opAuthoredBy = model.getProperty(Annotation.ANNOTATION_OP_AUTHORED_BY);
+		
 		Property dpLabel = model.getProperty(BaseAnnotation.ANNOTATION_DP_LABEL);
 		Property rdfsComment = model.getProperty(BaseAnnotation.RDFS_COMMENT);
 		Property bioteaOcurrences = model.getProperty(BaseAnnotation.BIOTEA_OCURRENCES);
@@ -169,19 +170,14 @@ public class AnnotationOWLDAO implements AnnotationDAO {
 		} else {
 			annotation.setId(id);
 		}
-		String idPrefix = Annotation.ANNOTATION_ID;
+		String idPrefix = OpenAnnotation.ANNOTATION_ID;
 		try {
 			idPrefix = annotation.getClass().getField("ANNOTATION_ID").get(null).toString();
 		} catch (Exception e) {} 
-		String annotationClazz = Annotation.ANNOTATION_CLASS;
-		try {
-			annotationClazz = annotation.getClass().getField("ANNOTATION_CLASS").get(null).toString();
-		} catch (Exception e) {}
+		String annotationClazz = OpenAnnotation.ANNOTATION_CLASS;
 				
 		Resource annotationRes;
 		Resource annotationClass = model.createResource(annotationClazz);
-		//Resource basicAnnotationClass = model.createResource(OpenAnnotation.ANNOTATION_CLASS); 
-		//Resource annotationRes = model.createIndividual(resourceURI, annotationClass).addLiteral(dpBody, annotation.getBody());
 		if (blankNode) {
 			if (annotation.getDocumentID() != null) {
 				annotation.setNodeId(annotation.getDocumentID() + "_" + idPrefix + annotation.getId());
@@ -191,75 +187,37 @@ public class AnnotationOWLDAO implements AnnotationDAO {
 			annotation.setUri(null);
 			annotationRes = model.createResource(new AnonId(annotation.getNodeId()));
 			annotationRes.addProperty(opType, annotationClass);
-			/*if (!annotationClazz.equals(OpenAnnotation.ANNOTATION_CLASS)) {
-				annotationRes.addProperty(opType, basicAnnotationClass);
-			}*/
 		} else {
 			annotation.setNodeId(null);
 			String resourceURI = baseURL + annotation.getId();
 			annotation.setUri(new URI(resourceURI));
 			annotationRes = model.createResource(annotation.getUri().toString(), annotationClass);
-			if (!annotationClazz.equals(Annotation.ANNOTATION_CLASS)) {
+			if (!annotationClazz.equals(OpenAnnotation.ANNOTATION_CLASS)) {
 				annotationRes.addProperty(opType, annotationClass);
 			}
 		}
-		//annotationRes.addProperty(opInDataset, annotationClass);
-		for (String body: annotation.getBodies()) {
-			annotationRes.addLiteral(dpBody, body);
-		}		
+		
+		//provenance
 		annotationRes.addLiteral(dpCreatedOn, annotation.getCreationDate());
-		if (annotation.getLabel() != null) {
-			annotationRes.addLiteral(dpLabel, annotation.getLabel());
-		}
-		//comments and number_items
-		if ((annotation.getComment() != null) && (annotation.getComment().length() != 0)) {
-			annotationRes.addLiteral(rdfsComment, annotation.getComment());
-		}
-		if (annotation.getFrequency() != null) {
-			annotationRes.addProperty(bioteaOcurrences, "" + annotation.getFrequency(), XSDDatatype.XSDint);
-		}		
-		if (annotation.getIDF() != null) {
-			annotationRes.addProperty(bioteaIDF, "" + annotation.getIDF(), XSDDatatype.XSDdouble);
-		}
-		if (annotation.getScore() != null) {
-			annotationRes.addProperty(dpScore, "" + annotation.getScore(), XSDDatatype.XSDdouble);
-		}
-		//Context		
-		if (ResourceConfig.getKeepSelector()) {
-			SelectorDAO<StartEndElementSelector> startEndElementOWL = new StartEndElementSelectorOWL();
-			SelectorDAO<ElementSelector> elementOWL = new ElementSelectorOWL();
-			SelectorDAO<OffsetRangeTextSelector> offsetSelectorOWL = new OffsetRangeTextSelectorOWL();
-			for (Selector selector:annotation.getContext()) {			
-				if (selector instanceof StartEndElementSelector) {
-					if (AnnotationResourceConfig.keepStartEnd()) {
-						StartEndElementSelector ses = (StartEndElementSelector)selector;
-						Resource resContext = startEndElementOWL.addSelector(ses, model);
-						model.add(annotationRes, opContext, resContext);
-					} else {
-						StartEndElementSelector temp = (StartEndElementSelector)selector;
-						ElementSelector ses = new ElementSelector(temp.getDocument());
-						ses.setDocumentId(temp.getDocumentId());
-						ses.setElementURI(temp.getElementURI());
-						ses.setSelector(temp.getSelector());
-						ses.setUri(temp.getUri());
-						Resource resContext = elementOWL.addSelector(ses, model);
-						model.add(annotationRes, opContext, resContext);
-					}				
-				} else if (selector instanceof ElementSelector) {
-					ElementSelector ses = (ElementSelector)selector;
-					Resource resContext = elementOWL.addSelector(ses, model);
-					model.add(annotationRes, opContext, resContext);
-				} else if (selector instanceof OffsetRangeTextSelector) {
-					OffsetRangeTextSelector ses = (OffsetRangeTextSelector)selector;
-					Resource resContext = offsetSelectorOWL.addSelector(ses, model);				
-					model.add(annotationRes, opContext, resContext);
-				}
-			}		
-		}		
-		//Topics
+		Resource resCreator = model.createResource(annotation.getCreator().getUri().toString());
+		annotationRes.addProperty(opCreatedBy, resCreator);
+		Resource resAuthor = model.createResource(annotation.getAuthor().getUri().toString());
+		annotationRes.addProperty(opAuthoredBy, resAuthor);		
+		
+		//body
+		int textualBody = 1;
+		Resource annotationTextualBodyClass = model.createResource(OpenAnnotation.TEXTUAL_BODY_CLASS);
+		for (String body: annotation.getBodies()) {
+			Resource annotationTextualBody = model.createResource(new AnonId("TextualBody_" + textualBody + "_" + annotation.getId() ));			
+			annotationTextualBody.addProperty(opType, annotationTextualBodyClass);
+			annotationTextualBody.addLiteral(opRDFValue, body);
+			annotationRes.addProperty(opBody, annotationTextualBody);
+			textualBody++;
+		}	
+		//body topics
 		for (ws.biotea.ld2rdf.rdf.model.ao.Topic topic:annotation.getTopics()) {
 			Resource resTopic = model.createResource(topic.getURL().toString());
-			annotationRes.addProperty(opHasTopic, resTopic);
+			annotationRes.addProperty(opBody, resTopic);
 			if (ResourceConfig.withBio()) {
 				String strIdentifier = AnnotationOntologyPrefix.toIdentifiersOrg(topic.getNameSpace().toString());
 				if (strIdentifier != null) {
@@ -288,33 +246,54 @@ public class AnnotationOWLDAO implements AnnotationDAO {
 			if ((topic.getComment() != null) && (topic.getComment().length() != 0)) {
 				resTopic.addLiteral(rdfsComment, topic.getComment());
 			}
+		}		
+		
+		//Context		
+		if (ResourceConfig.getKeepSelector()) {
+			for (Selector selector:annotation.getContext()) {			
+				if (selector instanceof ElementSelector) {
+					ElementSelector element = (ElementSelector)selector;
+					if (element.getElementURI().equals(annotation.getResource().getUri().toString())) {
+						Resource resDocument = model.createResource(annotation.getResource().getUri().toString()); 
+						annotationRes.addProperty(opHasTarget, resDocument);
+					} else {
+						Resource resSelector = model.createResource(element.getElementURI().toString());					
+						Resource resDocument = model.createResource(annotation.getResource().getUri().toString()); 
+						resSelector.addProperty(opHasSource, resDocument);
+						annotationRes.addProperty(opHasTarget, resSelector);
+					}					
+				}
+			}
+			if (annotation.getContext().isEmpty()) {
+				//annotated resource
+				Resource resDocument = model.createResource(annotation.getResource().getUri().toString()); 
+				annotationRes.addProperty(opHasTarget, resDocument);
+			}
+		} else {
+			//annotated resource
+			Resource resDocument = model.createResource(annotation.getResource().getUri().toString()); 
+			annotationRes.addProperty(opHasTarget, resDocument);
+		}	
+		
+		//others
+		if (annotation.getLabel() != null) {
+			annotationRes.addLiteral(dpLabel, annotation.getLabel());
 		}
-		//annotated resource
-		Resource resDocument = model.createResource(annotation.getResource().getUri().toString()); 
-		annotationRes.addProperty(opAnnotatesResource, resDocument);
-		//created by
-		Resource resCreator = model.createResource(annotation.getCreator().getUri().toString());
-		annotationRes.addProperty(opCreatedBy, resCreator);
-		//authored by
-		Resource resAuthor = model.createResource(annotation.getAuthor().getUri().toString());
-		annotationRes.addProperty(opAuthoredBy, resAuthor);
+		if ((annotation.getComment() != null) && (annotation.getComment().length() != 0)) {
+			annotationRes.addLiteral(rdfsComment, annotation.getComment());
+		}
+		if (annotation.getFrequency() != null) {
+			annotationRes.addProperty(bioteaOcurrences, "" + annotation.getFrequency(), XSDDatatype.XSDint);
+		}		
+		if (annotation.getIDF() != null) {
+			annotationRes.addProperty(bioteaIDF, "" + annotation.getIDF(), XSDDatatype.XSDdouble);
+		}
+		if (annotation.getScore() != null) {
+			annotationRes.addProperty(dpScore, "" + annotation.getScore(), XSDDatatype.XSDdouble);
+		}
 	}
 	//@Override
 	public void deleteAnnotation(String baseURL, String id, String uri, String fileOut, RDFFormat format, boolean empty) throws UnsupportedOperationException {
-		/*ConnectionLDModel conn = new ConnectionLDModel(this.prefixes);
-		JenaOWLModel owlModel = conn.openOWLModel(uri, fileOut, empty);
-		
-		String resourceURI = baseURL + "Annotation_" + id;
-		//Delete
-		OWLIndividual ind = owlModel.getOWLIndividual(resourceURI);
-		ind.delete();
-		//Delete selectors
-		OffsetRangeTextSelectorOWL ortsOWL = new OffsetRangeTextSelectorOWL();	
-		ortsOWL.deleteAnnotationSelector(id, owlModel);
-		XPointerSelectorOWL xpointerOWL = new XPointerSelectorOWL();
-		xpointerOWL.deleteAnnotationSelector(id, owlModel);
-		
-		conn.closeAndWriteOWLModel();*/
 		throw new UnsupportedOperationException();
 	}
 	//@Override

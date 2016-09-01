@@ -1,4 +1,4 @@
-package ws.biotea.ld2rdf.rdf.persistence.ao;
+package ws.biotea.ld2rdf.rdf.persistence;
 
 import java.io.FileNotFoundException;
 import java.net.URI;
@@ -16,7 +16,7 @@ import ws.biotea.ld2rdf.rdf.model.aoextended.AnnotationE;
 public interface AnnotationDAO {
 	/**
 	 * Inserts a new annotation.
-	 * @param Annotation Annotation to be updated.
+	 * @param OpenAnnotation OpenAnnotation to be updated.
 	 * @throws Exception 
 	 * @throws ClassNotFoundException 
 	 * @throws IllegalAccessException 
@@ -27,7 +27,7 @@ public interface AnnotationDAO {
 			, boolean blankNode) throws RDFModelIOException, FileNotFoundException, ClassNotFoundException, OntologyLoadException, URISyntaxException;
 	/**
 	 * Inserts a new annotation.
-	 * @param Annotation Annotation to be updated.
+	 * @param OpenAnnotation OpenAnnotation to be updated.
 	 * @throws Exception 
 	 * @throws ClassNotFoundException 
 	 * @throws IllegalAccessException 
@@ -58,28 +58,28 @@ public interface AnnotationDAO {
 			, String fileOut, RDFFormat format, boolean empty, boolean blankNode) throws RDFModelIOException;
 	/**
 	 * Updates an annotation.
-	 * @param Annotation Annotation to be updated.
+	 * @param OpenAnnotation OpenAnnotation to be updated.
 	 * @throws Exception
 	 */
 	public URI updateAnnotation(String datasetURL, String baseURL, AnnotationE annot, String uri
 			, String fileOut, RDFFormat format, boolean empty) throws Exception;
 	/**
 	 * Updates an annotation.
-	 * @param Annotation Annotation to be updated.
+	 * @param OpenAnnotation OpenAnnotation to be updated.
 	 * @throws Exception
 	 */
 	public URI updateAnnotation(String datasetURL, String baseURL, AnnotationE annot, String uri
 			, Model modelOut) throws Exception;
 	/**
 	 * Deletes an annotation given its id.
-	 * @param id Annotation id to be deleted.
+	 * @param id OpenAnnotation id to be deleted.
 	 * @throws Exception
 	 */
 	public void deleteAnnotation(String baseURL, String id, String uri, String fileOut, RDFFormat format
 			, boolean empty) throws UnsupportedOperationException;
 	/**
 	 * Deletes an annotation given its id.
-	 * @param id Annotation id to be deleted.
+	 * @param id OpenAnnotation id to be deleted.
 	 * @throws Exception
 	 */
 	public void deleteAnnotation(String baseURL, String id, String uri, Model modelOut) throws UnsupportedOperationException;

@@ -1,4 +1,4 @@
-package ws.biotea.ld2rdf.rdf.persistence.ao;
+package ws.biotea.ld2rdf.rdf.persistence;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -10,6 +10,7 @@ import java.util.List;
 import org.apache.jena.riot.RDFFormat;
 import org.apache.log4j.Logger;
 
+import ws.biotea.ld2rdf.rdf.model.BaseAnnotation;
 import ws.biotea.ld2rdf.rdf.model.ao.Annotation;
 import ws.biotea.ld2rdf.rdf.model.ao.FoafDocument;
 import ws.biotea.ld2rdf.rdf.model.ao.Topic;
@@ -43,8 +44,8 @@ public class AnnotationOWLReader {
 		Model model = conn.openJenaModel(doc.getAbsolutePath(), false, format);
 		
 		Property opType = model.getProperty(ResourceConfig.OP_RDF_TYPE);
-		Property bioteaOcurrences = model.getProperty(Annotation.BIOTEA_OCURRENCES);
-		Property bioteaIDF = model.getProperty(Annotation.BIOTEA_IDF);
+		Property bioteaOcurrences = model.getProperty(BaseAnnotation.BIOTEA_OCURRENCES);
+		Property bioteaIDF = model.getProperty(BaseAnnotation.BIOTEA_IDF);
 		Property opHasTopic = model.getProperty(Annotation.ANNOTATION_OP_HAS_TOPIC);
 		Property dpTUI = model.getProperty(AnnotationClassesAndProperties.UMLS_TUI.getURLValue());
 		Property opAnnotatesResource = model.getProperty(Annotation.ANNOTATION_OP_ANNOTATES_RESOURCE);
