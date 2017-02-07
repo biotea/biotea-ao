@@ -1,5 +1,6 @@
 package ws.biotea.ld2rdf.rdf.persistence.ao;
 
+import java.net.URI;
 import java.net.URISyntaxException;
 
 
@@ -10,7 +11,6 @@ import ws.biotea.ld2rdf.util.ResourceConfig;
 
 import com.hp.hpl.jena.datatypes.xsd.XSDDatatype;
 import com.hp.hpl.jena.ontology.OntModel;
-import com.hp.hpl.jena.rdf.model.AnonId;
 import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.rdf.model.Property;
 import com.hp.hpl.jena.rdf.model.Resource;
@@ -19,13 +19,14 @@ import edu.stanford.smi.protegex.owl.jena.JenaOWLModel;
 
 public class StartEndElementSelectorOWL implements SelectorDAO<StartEndElementSelector>{
 
-	public Resource addSelector(StartEndElementSelector selector, Model model)
+	public Resource addSelector(StartEndElementSelector selector, Model model, String baseURL)
 			throws URISyntaxException {
 		Property opType = model.getProperty(ResourceConfig.OP_RDF_TYPE);
 		Property opOnResource = model.getProperty(Selector.SELECTOR_OP_ON_RESOURCE);
 		Property dpStart = model.getProperty(StartEndElementSelector.START_END_ELEMENT_SELECTOR_DP_INIT);
 		Property dpEnd = model.getProperty(StartEndElementSelector.START_END_ELEMENT_SELECTOR_DP_END);
 		Property opLocator = model.getProperty(StartEndElementSelector.START_END_ELEMENT_SELECTOR_DP_LOCATOR);
+		
 		if (selector.getId() == null) {
 			selector.setId(
 				GenerateMD5.getInstance().getMD5Hash(
@@ -33,19 +34,11 @@ public class StartEndElementSelectorOWL implements SelectorDAO<StartEndElementSe
 					selector.getEnd()
 				) + "_" + selector.getSelector().replaceAll("[^A-Za-z0-9]", ""));
 		}
-		//System.out.println("ID: " + selector.getId());
-//		String resourceURI = baseURL + "Selector_" + selector.getId();
-//		selector.setUri(new URI(resourceURI));
-		if (selector.getDocumentId() != null) {
-			selector.setNodeId(selector.getDocumentId() + "_Selector_" + selector.getId());
-		} else {
-			selector.setNodeId("Selector_" + selector.getId());
-		}
-		selector.setUri(null);
 		
+		String resourceURI = baseURL + "Selector_" + selector.getId();
+		selector.setUri(new URI(resourceURI));		
 		Resource selectorClass = model.createResource(StartEndElementSelector.START_END_ELEMENT_SELECTOR_CLASS);
-//		Resource selectorRes = model.createResource(selector.getUri().toString(), selectorClass);
-		Resource selectorRes = model.createResource(new AnonId(selector.getNodeId()));
+		Resource selectorRes = model.createResource(selector.getUri().toString(), selectorClass);
 		selectorRes.addProperty(opType, selectorClass);
 		
 		Resource resDocument = model.createResource(selector.getDocument().getUri().toString()); 

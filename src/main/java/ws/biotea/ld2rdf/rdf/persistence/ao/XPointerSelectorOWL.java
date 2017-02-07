@@ -95,7 +95,7 @@ public class XPointerSelectorOWL implements SelectorDAO<XPointerSelector>{
 		// Important - free up resources used running the query
 		qe.close();
 	}
-	public Resource addSelector(XPointerSelector selector, Model model) throws URISyntaxException {
+	public Resource addSelector(XPointerSelector selector, Model model, String baseURL) throws URISyntaxException {
 		// TODO Auto-generated method stub
 		return null;
 	}

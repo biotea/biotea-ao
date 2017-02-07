@@ -25,7 +25,6 @@ import ws.biotea.ld2rdf.rdf.model.ao.FoafAgent;
 import ws.biotea.ld2rdf.rdf.model.ao.FoafDocument;
 import ws.biotea.ld2rdf.rdf.model.ao.Topic;
 import ws.biotea.ld2rdf.rdf.model.aoextended.AnnotationE;
-import ws.biotea.ld2rdf.rdf.persistence.AnnotationDAO;
 import ws.biotea.ld2rdf.rdf.persistence.ao.AnnotationOWLDAO;
 import ws.biotea.ld2rdf.rdf.persistence.ConnectionLDModel;
 import ws.biotea.ld2rdf.util.ResourceConfig;
@@ -82,7 +81,7 @@ public class TestAnnotationOWLDAO {
 	@Test
 	public void insertBlankNodeAnnotation() {		
 		try {			
-			AnnotationDAO dao = new AnnotationOWLDAO();	
+			AnnotationOWLDAO dao = new AnnotationOWLDAO();	
 
 			URI uri = dao.insertAnnotation("http://base.com/", "http://biotea.ws/annotation/pmc_resource/123/", annot, null, model, true);
 			assertNull("Blank nodes should have null URIs", uri);
@@ -100,7 +99,7 @@ public class TestAnnotationOWLDAO {
 	@Test
 	public void insertAnnotation() {		
 		try {			
-			AnnotationDAO dao = new AnnotationOWLDAO();	
+			AnnotationOWLDAO dao = new AnnotationOWLDAO();	
 
 			URI uri = dao.insertAnnotation("http://base.com/", "http://biotea.ws/annotation/pmc_resource/123/", annot, null, model, false);
 			assertNotNull("Regular nodes should not have null URIs", uri);
@@ -118,7 +117,7 @@ public class TestAnnotationOWLDAO {
 	@Test
 	public void insertAnnotationGivenId() {		
 		try {			
-			AnnotationDAO dao = new AnnotationOWLDAO();	
+			AnnotationOWLDAO dao = new AnnotationOWLDAO();	
 
 			URI uri = dao.insertAnnotation("http://base.com/", "http://biotea.ws/annotation/pmc_resource/123/", annot, "annot_id", model, false);
 			assertEquals("OpenAnnotation URI should be returned", annot.getUri(), uri);
@@ -134,7 +133,7 @@ public class TestAnnotationOWLDAO {
 	@Test
 	public void insertAnnotationWithId() {		
 		try {			
-			AnnotationDAO dao = new AnnotationOWLDAO();	
+			AnnotationOWLDAO dao = new AnnotationOWLDAO();	
 
 			annot.setId("id");
 			URI uri = dao.insertAnnotation("http://base.com/", "http://biotea.ws/annotation/pmc_resource/123/", annot, null, model, false);
@@ -151,7 +150,7 @@ public class TestAnnotationOWLDAO {
 	@Test
 	public void insertAnnotationWithIdGivenId() {		
 		try {			
-			AnnotationDAO dao = new AnnotationOWLDAO();	
+			AnnotationOWLDAO dao = new AnnotationOWLDAO();	
 
 			annot.setId("id");
 			URI uri = dao.insertAnnotation("http://base.com/", "http://biotea.ws/annotation/pmc_resource/123/", annot, "annot_id", model, false);
@@ -179,7 +178,7 @@ public class TestAnnotationOWLDAO {
 		
 		
 		try {			
-			AnnotationDAO dao = new AnnotationOWLDAO();	
+			AnnotationOWLDAO dao = new AnnotationOWLDAO();	
 
 			URI uri = dao.insertAnnotation("http://base.com/", "http://biotea.ws/annotation/pmc_resource/123/", annot, null, model, false);
 			Resource resource = model.getResource(uri.toString());

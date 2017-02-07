@@ -41,7 +41,7 @@ import java.util.Map;
  * @author leylajael
  *
  */
-public class AnnotationOWLOA implements AnnotationDAO {
+public class AnnotationOWLOA extends AnnotationDAO {
 	Logger logger = Logger.getLogger(this.getClass());
 	private List<Map<String, String>> prefixes;
 	

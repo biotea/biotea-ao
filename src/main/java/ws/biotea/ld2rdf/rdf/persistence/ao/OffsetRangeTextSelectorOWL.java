@@ -3,6 +3,7 @@
  */
 package ws.biotea.ld2rdf.rdf.persistence.ao;
 
+import java.net.URI;
 import java.net.URISyntaxException;
 
 
@@ -15,7 +16,6 @@ import ws.biotea.ld2rdf.util.GenerateMD5;
 
 import com.hp.hpl.jena.datatypes.xsd.XSDDatatype;
 import com.hp.hpl.jena.ontology.OntModel;
-import com.hp.hpl.jena.rdf.model.AnonId;
 import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.rdf.model.Property;
 import com.hp.hpl.jena.rdf.model.Resource;
@@ -33,7 +33,7 @@ public class OffsetRangeTextSelectorOWL implements SelectorDAO<OffsetRangeTextSe
 	 */
 	public OffsetRangeTextSelectorOWL() {
 	}
-	public Resource addSelector(OffsetRangeTextSelector selector, Model model) throws URISyntaxException {
+	public Resource addSelector(OffsetRangeTextSelector selector, Model model, String baseURL) throws URISyntaxException {
 		Property opType = model.getProperty(ResourceConfig.OP_RDF_TYPE);
 		Property opOnResource = model.getProperty(Selector.SELECTOR_OP_ON_RESOURCE);
 		Property dpOffset = model.getProperty(OffsetRangeTextSelector.OFFSET_RANGE_TEXT_SELECTOR_DP_OFFSET);
@@ -47,16 +47,10 @@ public class OffsetRangeTextSelectorOWL implements SelectorDAO<OffsetRangeTextSe
 					selector.getRange()
 				) + "_" + selector.getSelector().replaceAll("[^A-Za-z0-9]", ""));
 		}
-		if (selector.getDocumentId() != null) {
-			selector.setNodeId(selector.getDocumentId() + "_Selector_" + selector.getId());
-		} else {
-			selector.setNodeId("Selector_" + selector.getId());
-		}
-		selector.setUri(null);
-		
-		//Selector
+		String resourceURI = baseURL + "Selector_" + selector.getId();
+		selector.setUri(new URI(resourceURI));
 		Resource selectorClass = model.createResource(OffsetRangeTextSelector.OFFSET_RANGE_TEXT_SELECTOR_CLASS);
-		Resource selectorRes = model.createResource(new AnonId(selector.getNodeId()));
+		Resource selectorRes = model.createResource(selector.getUri().toString(), selectorClass);
 		selectorRes.addProperty(opType, selectorClass);
 		
 		Resource resDocument = model.createResource(selector.getDocument().getUri().toString()); 
