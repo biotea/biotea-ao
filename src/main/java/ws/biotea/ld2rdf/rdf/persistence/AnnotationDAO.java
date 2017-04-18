@@ -30,7 +30,7 @@ public abstract class AnnotationDAO {
 	 * @throws InstantiationException 
 	 * @throws Exception
 	 */
-	protected abstract URI insertAnnotation(String datasetURL, String baseURL, AnnotationE annot, String id, Model modelOut
+	protected abstract URI insertAnnotation(String base, String baseURL, AnnotationE annot, String id, Model modelOut
 			, boolean blankNode) throws RDFModelIOException, FileNotFoundException, ClassNotFoundException, OntologyLoadException, URISyntaxException;
 	/**
 	 * Inserts a new annotation.
@@ -41,7 +41,7 @@ public abstract class AnnotationDAO {
 	 * @throws InstantiationException 
 	 * @throws Exception
 	 */
-	protected abstract URI insertAnnotation(String datasetURL, String baseURL, AnnotationE annot, String id, String fileOut
+	protected abstract URI insertAnnotation(String base, String baseURL, AnnotationE annot, String id, String fileOut
 			, RDFFormat format, boolean empty, boolean blankNode) throws RDFModelIOException, FileNotFoundException, ClassNotFoundException, OntologyLoadException, URISyntaxException;
 	/**
 	 * Inserts a list of annotations.
@@ -51,7 +51,7 @@ public abstract class AnnotationDAO {
 	 * @param empty
 	 * @throws Exception
 	 */
-	public abstract List<AnnotationE> insertAnnotations(String datasetURL, String baseURL, List<AnnotationE> list
+	public abstract List<AnnotationE> insertAnnotations(String base, String baseURL, List<AnnotationE> list
 			, Model modelOut, boolean blankNode) throws RDFModelIOException;
 	/**
 	 * Inserts a list of annotations.
@@ -61,21 +61,21 @@ public abstract class AnnotationDAO {
 	 * @param empty
 	 * @throws Exception
 	 */
-	public abstract List<AnnotationE> insertAnnotations(String datasetURL, String baseURL, List<AnnotationE> list
+	public abstract List<AnnotationE> insertAnnotations(String base, String baseURL, List<AnnotationE> list
 			, String fileOut, RDFFormat format, boolean empty, boolean blankNode) throws RDFModelIOException;
 	/**
 	 * Updates an annotation.
 	 * @param OpenAnnotation OpenAnnotation to be updated.
 	 * @throws Exception
 	 */
-	protected abstract URI updateAnnotation(String datasetURL, String baseURL, AnnotationE annot, String uri
+	protected abstract URI updateAnnotation(String base, String baseURL, AnnotationE annot, String uri
 			, String fileOut, RDFFormat format, boolean empty) throws Exception;
 	/**
 	 * Updates an annotation.
 	 * @param OpenAnnotation OpenAnnotation to be updated.
 	 * @throws Exception
 	 */
-	protected abstract URI updateAnnotation(String datasetURL, String baseURL, AnnotationE annot, String uri
+	protected abstract URI updateAnnotation(String base, String baseURL, AnnotationE annot, String uri
 			, Model modelOut) throws Exception;
 	/**
 	 * Deletes an annotation given its id.
@@ -101,9 +101,9 @@ public abstract class AnnotationDAO {
 	 * @param dtpName
 	 * @param literal
 	 */
-	protected void addDatatypeLiteral(Model model, Resource resource, String baseURL, String namespace, String dtpName, String literal, XSDDatatype type) {
+	protected void addDatatypeLiteral(Model model, String base, Resource resource, String baseURL, String namespace, String dtpName, String literal, XSDDatatype type) {
 		if ((literal != null) && (literal.length() != 0)) {
-			DatatypeProperty dtp = MappingConfig.getDatatypeProperty(namespace, dtpName);
+			DatatypeProperty dtp = MappingConfig.getDatatypeProperty(base, namespace, dtpName);
 			if (dtp != null) {
 				Property dtProperty = model.getProperty(dtp.getDtpName());
 				if (dtp.isReified()) {
@@ -135,8 +135,8 @@ public abstract class AnnotationDAO {
 	 * @param namespace
 	 * @param opName
 	 */
-	protected void addObjectProperty(Model model, Resource from, Resource to, String namespace, String opName) {
-		String opMapping = MappingConfig.getObjectProperty(namespace, opName);
+	protected void addObjectProperty(Model model, String base, Resource from, Resource to, String namespace, String opName) {
+		String opMapping = MappingConfig.getObjectProperty(base, namespace, opName);
 		if (opMapping != null) {
 			Property opProperty = model.getProperty(opMapping);
 			from.addProperty(opProperty, to);
@@ -151,8 +151,8 @@ public abstract class AnnotationDAO {
 	 * @param namespace
 	 * @param opName
 	 */
-	protected void addObjectProperty(Model model, Resource from, String to, String namespace, String opName) {		
-		String opMapping = MappingConfig.getObjectProperty(namespace, opName);
+	protected void addObjectProperty(Model model, String base, Resource from, String to, String namespace, String opName) {		
+		String opMapping = MappingConfig.getObjectProperty(base, namespace, opName);
 		if (opMapping != null) {
 			Resource node = model.createResource(to);
 			Property opProperty = model.getProperty(opMapping);
@@ -168,8 +168,8 @@ public abstract class AnnotationDAO {
 	 * @param namespace
 	 * @param opName
 	 */
-	protected void addObjectProperty(Model model, String from, Resource to, String namespace, String opName) {
-		String opMapping = MappingConfig.getObjectProperty(namespace, opName);
+	protected void addObjectProperty(Model model, String base, String from, Resource to, String namespace, String opName) {
+		String opMapping = MappingConfig.getObjectProperty(base, namespace, opName);
 		if (opMapping != null) {
 			Resource node = model.createResource(from);
 			Property opProperty = model.getProperty(opMapping);

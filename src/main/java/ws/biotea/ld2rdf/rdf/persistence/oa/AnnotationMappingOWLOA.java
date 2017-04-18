@@ -22,6 +22,7 @@ import ws.biotea.ld2rdf.rdf.model.aoextended.AnnotationE;
 import ws.biotea.ld2rdf.rdf.model.oa.OpenAnnotation;
 import ws.biotea.ld2rdf.rdf.persistence.AnnotationDAO;
 import ws.biotea.ld2rdf.rdf.persistence.ConnectionLDModel;
+import ws.biotea.ld2rdf.rdfGeneration.jats.GlobalArticleConfig;
 import ws.biotea.ld2rdf.util.annotation.AnnotationClassesAndProperties;
 import ws.biotea.ld2rdf.util.ResourceConfig;
 import ws.biotea.ld2rdf.util.annotation.AnnotationOntologyPrefix;
@@ -63,18 +64,17 @@ public class AnnotationMappingOWLOA extends AnnotationDAO {
 	 * @throws FileNotFoundException 
 	 */
 	//@Override
-	public URI insertAnnotation(String datasetURL, String baseURL,
-			AnnotationE annot, String id, Model modelOut, 
+	public URI insertAnnotation(String base, String baseURL, AnnotationE annot, String id, Model modelOut, 
 			boolean blankNode) throws RDFModelIOException, FileNotFoundException, ClassNotFoundException, OntologyLoadException, URISyntaxException {
-		createAnnotationInModel(modelOut, datasetURL, baseURL, annot, id, blankNode);
+		createAnnotationInModel(base, baseURL, annot, id, modelOut, blankNode);
 		return (annot.getUri());
 	}
 	
 	//@Override
-	public URI insertAnnotation(String datasetURL, String baseURL, AnnotationE annotation, String id, String fileOutName, RDFFormat format, boolean empty, boolean blankNode) throws RDFModelIOException, FileNotFoundException, ClassNotFoundException, OntologyLoadException, URISyntaxException {
+	public URI insertAnnotation(String base, String baseURL, AnnotationE annotation, String id, String fileOutName, RDFFormat format, boolean empty, boolean blankNode) throws RDFModelIOException, FileNotFoundException, ClassNotFoundException, OntologyLoadException, URISyntaxException {
 		ConnectionLDModel conn = new ConnectionLDModel(this.prefixes);
 		Model model = conn.openJenaModel(fileOutName, empty);		
-		this.insertAnnotation(datasetURL, baseURL, annotation, id, model, blankNode);
+		this.insertAnnotation(base, baseURL, annotation, id, model, blankNode);
 		conn.closeAndWriteJenaModel(format);
 		return (annotation.getUri());
 	}
@@ -90,13 +90,12 @@ public class AnnotationMappingOWLOA extends AnnotationDAO {
 	 * @throws Exception
 	 */
 	//@Override
-	public List<AnnotationE> insertAnnotations(String datasetURL,
-			String baseURL, List<AnnotationE> list, Model modelOut,  
+	public List<AnnotationE> insertAnnotations(String base, String baseURL, List<AnnotationE> list, Model modelOut,  
 			boolean blankNode) throws RDFModelIOException {
 		List<AnnotationE> inserted = new ArrayList<AnnotationE>();
 		for (AnnotationE annotation: list) {
 			try {
-				createAnnotationInModel(modelOut, datasetURL, baseURL, annotation, null, blankNode);				
+				createAnnotationInModel(base, baseURL, annotation, null, modelOut, blankNode);				
 				inserted.add(annotation);
 			} catch (Exception e) {
 				//e.printStackTrace();
@@ -106,13 +105,13 @@ public class AnnotationMappingOWLOA extends AnnotationDAO {
 		return inserted;
 	}
 	//@Override
-	public List<AnnotationE> insertAnnotations(String datasetURL, String baseURL, List<AnnotationE> list
+	public List<AnnotationE> insertAnnotations(String base, String baseURL, List<AnnotationE> list
 			, String fileOutName, RDFFormat format, boolean empty, boolean blankNode) throws RDFModelIOException {
 		List<AnnotationE> inserted = new ArrayList<AnnotationE>();
 		try {			
 			ConnectionLDModel conn = new ConnectionLDModel(this.prefixes);
 			Model model = conn.openJenaModel(fileOutName, empty);	
-			inserted = this.insertAnnotations(datasetURL, baseURL, list, model, blankNode);
+			inserted = this.insertAnnotations(base, baseURL, list, model, blankNode);
 			conn.closeAndWriteJenaModel(format);
 		} catch (Exception e) {
 			//e.printStackTrace();
@@ -135,13 +134,16 @@ public class AnnotationMappingOWLOA extends AnnotationDAO {
 	 * @param id
 	 * @throws URISyntaxException
 	 */
-	private void createAnnotationInModel(Model model, String datasetURL, String baseURL, AnnotationE annotation
-			, String id, boolean blankNode) throws URISyntaxException {
+	private void createAnnotationInModel (String base, String baseURL, AnnotationE annotation, String id, Model model, 
+			boolean blankNode)  throws URISyntaxException {
+		
 		Property opType = model.getProperty(ResourceConfig.OP_RDF_TYPE);		
 		Property dpLabel = model.getProperty(BaseAnnotation.ANNOTATION_DP_LABEL);
 		Property rdfsComment = model.getProperty(BaseAnnotation.RDFS_COMMENT);
 		Property opSeeAlso = model.getProperty(BaseAnnotation.RDFS_SEE_ALSO);
 		Property opSameAs = model.getProperty(BaseAnnotation.OWL_SAME_AS);
+		
+		baseURL += annotation.getDocumentID();
 		
 		//OpenAnnotation, Body (literal), and createdOn (date)
 		if (id == null) {
@@ -157,7 +159,7 @@ public class AnnotationMappingOWLOA extends AnnotationDAO {
 		try {
 			idPrefix = annotation.getClass().getField("ANNOTATION_ID").get(null).toString();
 		} catch (Exception e) {} 
-		String annotationClazz = MappingConfig.getClass("oa", "Annotation");
+		String annotationClazz = MappingConfig.getClass(base, "oa", "Annotation");
 				
 		Resource annotationRes;
 		Resource annotationClass = model.createResource(annotationClazz);
@@ -172,7 +174,7 @@ public class AnnotationMappingOWLOA extends AnnotationDAO {
 			annotationRes.addProperty(opType, annotationClass);
 		} else {
 			annotation.setNodeId(null);
-			String resourceURI = baseURL + annotation.getId();
+			String resourceURI = baseURL + "_" + annotation.getId();
 			annotation.setUri(new URI(resourceURI));
 			annotationRes = model.createResource(annotation.getUri().toString(), annotationClass);
 			if (!annotationClazz.equals(OpenAnnotation.ANNOTATION_CLASS)) {
@@ -181,28 +183,28 @@ public class AnnotationMappingOWLOA extends AnnotationDAO {
 		}
 		
 		//provenance
-		this.addDatatypeLiteral(model, annotationRes, baseURL, "pav", "createdOn", 
+		this.addDatatypeLiteral(model, base, annotationRes, baseURL, "pav", "createdOn", 
 			DateFormat.getDateInstance(DateFormat.DEFAULT).format(annotation.getCreationDate().getTime()), null);
 		Resource resCreator = model.createResource(annotation.getCreator().getUri().toString());
-		this.addObjectProperty(model, annotationRes, resCreator, "pav", "createdBy");
+		this.addObjectProperty(model, base, annotationRes, resCreator, "pav", "createdBy");
 		Resource resAuthor = model.createResource(annotation.getAuthor().getUri().toString());
-		this.addObjectProperty(model, annotationRes, resAuthor, "pav", "authoredBy");
+		this.addObjectProperty(model, base, annotationRes, resAuthor, "pav", "authoredBy");
 		
 		//body
 		int textualBody = 1;
-		Resource annotationTextualBodyClass = model.createResource(MappingConfig.getClass("oa", "TextualBody"));
+		Resource annotationTextualBodyClass = model.createResource(MappingConfig.getClass(base, "oa", "TextualBody"));
 		for (String body: annotation.getBodies()) {
 			Resource annotationTextualBody = model.createResource(new AnonId("TextualBody_" + textualBody + "_" + annotation.getId() ));			
 			annotationTextualBody.addProperty(opType, annotationTextualBodyClass);
-			this.addDatatypeLiteral(model, annotationTextualBody, baseURL, "rdf", "value", body, null);
+			this.addDatatypeLiteral(model, base, annotationTextualBody, baseURL, "rdf", "value", body, null);
 			
-			this.addObjectProperty(model, annotationRes, annotationTextualBody, "oa", "hasBody");
+			this.addObjectProperty(model, base, annotationRes, annotationTextualBody, "oa", "hasBody");
 			textualBody++;
 		}	
 		//body topics
 		for (ws.biotea.ld2rdf.rdf.model.ao.Topic topic:annotation.getTopics()) {
 			Resource resTopic = model.createResource(topic.getURL().toString());
-			this.addObjectProperty(model, annotationRes, resTopic, "oa", "hasBody");
+			this.addObjectProperty(model, base, annotationRes, resTopic, "oa", "hasBody");
 			if (ResourceConfig.withBio()) {
 				String strIdentifier = AnnotationOntologyPrefix.toIdentifiersOrg(topic.getNameSpace().toString());
 				if (strIdentifier != null) {
@@ -217,12 +219,12 @@ public class AnnotationMappingOWLOA extends AnnotationDAO {
 			}  
 			String cui = AnnotationOntologyPrefix.getCUI(topic.getURL().toString());
             if (cui != null) {
-            	this.addDatatypeLiteral(model, resTopic, baseURL, "umls", "cui", cui, null);
+            	this.addDatatypeLiteral(model, base, resTopic, baseURL, "umls", "cui", cui, null);
             	for (String sty: topic.getUmlsType()) {
-        			this.addDatatypeLiteral(model, resTopic, baseURL, "umls", "tui", sty, null);
+        			this.addDatatypeLiteral(model, base, resTopic, baseURL, "umls", "tui", sty, null);
             		
             		Resource typeClass = model.createResource(AnnotationClassesAndProperties.UMLS_STY.getURLValue() + "/" + sty);
-            		this.addObjectProperty(model, resTopic, typeClass, "umls", "hasSTY");
+            		this.addObjectProperty(model, base ,resTopic, typeClass, "umls", "hasSTY");
             	}
             } 
 			for (URI seeAlso: topic.getSeeAlso()) {
@@ -240,25 +242,29 @@ public class AnnotationMappingOWLOA extends AnnotationDAO {
 				if (selector instanceof ElementSelector) {
 					ElementSelector element = (ElementSelector)selector;
 					if (element.getElementURI().equals(annotation.getResource().getUri().toString())) {
-						Resource resDocument = model.createResource(annotation.getResource().getUri().toString()); 
-						this.addObjectProperty(model, annotationRes, resDocument, "oa", "hasTarget");
+						Resource resDocument = model.createResource(GlobalArticleConfig.getArticleRdfUri(ResourceConfig.getBioteaBase(base), annotation.getDocumentID())); 
+						this.addObjectProperty(model, base, annotationRes, resDocument, "oa", "hasTarget");
 					} else {
-						Resource resSelector = model.createResource(element.getElementURI().toString());					
-						Resource resDocument = model.createResource(annotation.getResource().getUri().toString());
-						this.addObjectProperty(model, resSelector, resDocument, "oa", "hasSource");
-						this.addObjectProperty(model, annotationRes, resSelector, "oa", "hasTarget");
+						String resSelectorURI = element.getElementURI();
+						if (!resSelectorURI.startsWith("http://")) {
+							resSelectorURI = GlobalArticleConfig.getArticleParagraphRdfUri(ResourceConfig.getBioteaBase(base), annotation.getDocumentID(), resSelectorURI);
+						}	
+						Resource resSelector = model.createResource(resSelectorURI);
+						Resource resDocument = model.createResource(GlobalArticleConfig.getArticleRdfUri(ResourceConfig.getBioteaBase(base), annotation.getDocumentID()));
+						this.addObjectProperty(model, base, resSelector, resDocument, "oa", "hasSource");
+						this.addObjectProperty(model, base, annotationRes, resSelector, "oa", "hasTarget");
 					}					
 				}
 			}
 			if (annotation.getContext().isEmpty()) {
 				//annotated resource
-				Resource resDocument = model.createResource(annotation.getResource().getUri().toString());
-				this.addObjectProperty(model, annotationRes, resDocument, "oa", "hasTarget");
+				Resource resDocument = model.createResource(GlobalArticleConfig.getArticleRdfUri(ResourceConfig.getBioteaBase(base), annotation.getDocumentID()));
+				this.addObjectProperty(model, base, annotationRes, resDocument, "oa", "hasTarget");
 			}
 		} else {
 			//annotated resource
-			Resource resDocument = model.createResource(annotation.getResource().getUri().toString()); 
-			this.addObjectProperty(model, annotationRes, resDocument, "oa", "hasTarget");
+			Resource resDocument = model.createResource(GlobalArticleConfig.getArticleRdfUri(ResourceConfig.getBioteaBase(base), annotation.getDocumentID()));
+			this.addObjectProperty(model, base, annotationRes, resDocument, "oa", "hasTarget");
 		}	
 		
 		//others
@@ -269,13 +275,13 @@ public class AnnotationMappingOWLOA extends AnnotationDAO {
 			annotationRes.addLiteral(rdfsComment, annotation.getComment());
 		}
 		if (annotation.getFrequency() != null) {
-			this.addDatatypeLiteral(model, annotationRes, baseURL, "biotea", "tf", "" + annotation.getFrequency(), XSDDatatype.XSDint);
+			this.addDatatypeLiteral(model, base, annotationRes, baseURL, "biotea", "tf", "" + annotation.getFrequency(), XSDDatatype.XSDint);
 		}		
 		if (annotation.getIDF() != null) {
-			this.addDatatypeLiteral(model, annotationRes, baseURL, "biotea", "idf", "" + annotation.getIDF(), XSDDatatype.XSDdouble);
+			this.addDatatypeLiteral(model, base, annotationRes, baseURL, "biotea", "idf", "" + annotation.getIDF(), XSDDatatype.XSDdouble);
 		}
 		if (annotation.getScore() != null) {
-			this.addDatatypeLiteral(model, annotationRes, baseURL, "biotea", "score", "" + annotation.getScore(), XSDDatatype.XSDdouble);
+			this.addDatatypeLiteral(model, base, annotationRes, baseURL, "biotea", "score", "" + annotation.getScore(), XSDDatatype.XSDdouble);
 		}
 	}
 	//@Override
@@ -287,15 +293,15 @@ public class AnnotationMappingOWLOA extends AnnotationDAO {
 		throw new UnsupportedOperationException();
 	}
 	//@Override
-	public URI updateAnnotation(String datasetURL, String baseURL, AnnotationE annotation, String uri
+	public URI updateAnnotation(String base, String baseURL, AnnotationE annotation, String uri
 			, String fileOut, RDFFormat format, boolean empty) throws Exception {
 		this.deleteAnnotation(baseURL, annotation.getId(), uri, fileOut, format, empty);
-		return (this.insertAnnotation(datasetURL, baseURL, annotation, annotation.getId(), fileOut
+		return (this.insertAnnotation(base, baseURL, annotation, annotation.getId(), fileOut
 				, format, empty, annotation.getUri() == null));
 	}
 	//@Override
-	public URI updateAnnotation(String datasetURL, String baseURL, AnnotationE annotation, String uri, Model modelOut) throws Exception {
+	public URI updateAnnotation(String base, String baseURL, AnnotationE annotation, String uri, Model modelOut) throws Exception {
 		this.deleteAnnotation(baseURL, annotation.getId(), uri, modelOut);
-		return (this.insertAnnotation(datasetURL, baseURL, annotation, annotation.getId(), modelOut, annotation.getUri() == null));
+		return (this.insertAnnotation(base, baseURL, annotation, annotation.getId(), modelOut, annotation.getUri() == null));
 	}	
 }

@@ -19,7 +19,7 @@ import edu.stanford.smi.protegex.owl.jena.JenaOWLModel;
 
 public class StartEndElementSelectorOWL implements SelectorDAO<StartEndElementSelector>{
 
-	public Resource addSelector(StartEndElementSelector selector, Model model, String baseURL)
+	public Resource addSelector(StartEndElementSelector selector, Model model, String base, String baseURL, String documentID)
 			throws URISyntaxException {
 		Property opType = model.getProperty(ResourceConfig.OP_RDF_TYPE);
 		Property opOnResource = model.getProperty(Selector.SELECTOR_OP_ON_RESOURCE);
@@ -63,7 +63,7 @@ public class StartEndElementSelectorOWL implements SelectorDAO<StartEndElementSe
 		
 	}
 
-	public Resource addSelector(StartEndElementSelector selector, OntModel model)
+	public Resource addSelector(StartEndElementSelector selector, OntModel model, String base)
 			throws URISyntaxException {
 		// TODO Auto-generated method stub
 		return null;

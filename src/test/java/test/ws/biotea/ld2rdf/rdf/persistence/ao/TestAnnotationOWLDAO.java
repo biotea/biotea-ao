@@ -62,7 +62,7 @@ public class TestAnnotationOWLDAO {
 
 		document = new FoafDocument();
 		Calendar now = Calendar.getInstance();
-		document.setId(new URI("http://www.ncbi.nlm.nih.gov/pmc/articles/PMC2940432"));
+		document.setUri(new URI("http://www.ncbi.nlm.nih.gov/pmc/articles/PMC2940432"));
 		annot.setResource(document);
 		annot.setCreationDate(now);
 	}
@@ -217,7 +217,7 @@ public class TestAnnotationOWLDAO {
 			
 			statement = resource.getProperty(dpCreatedOn);
 			statement.getObject().asLiteral().getValue().toString();
-			String inModel = Conversion.calendarToString(Conversion.xsdDateTimeToCalendar(statement.getObject().asLiteral().getValue().toString()));
+			String inModel = Conversion.calendarToString(Conversion.xsdDateTimeToCalendar(statement.getObject().asLiteral().getValue().toString()), '/');
 			assertEquals("OpenAnnotation creation date", annot.getCreationDateAsString(), inModel);
 		} catch (Exception e) {
 			e.printStackTrace();

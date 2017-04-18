@@ -170,7 +170,7 @@ public class Annotation implements Serializable {
 	 * @return the creationDate
 	 */
 	public String getCreationDateAsString() {
-		return (Conversion.calendarToString(this.creationDate));
+		return (Conversion.calendarToString(this.creationDate, '/'));
 	}
 	/**
 	 * Sets the value for the creationDate xsd:dateTime (2010-10-24T12:48:42.361Z).

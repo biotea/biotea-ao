@@ -33,7 +33,7 @@ public class OffsetRangeTextSelectorOWL implements SelectorDAO<OffsetRangeTextSe
 	 */
 	public OffsetRangeTextSelectorOWL() {
 	}
-	public Resource addSelector(OffsetRangeTextSelector selector, Model model, String baseURL) throws URISyntaxException {
+	public Resource addSelector(OffsetRangeTextSelector selector, Model model, String base, String baseURL, String documentID) throws URISyntaxException {
 		Property opType = model.getProperty(ResourceConfig.OP_RDF_TYPE);
 		Property opOnResource = model.getProperty(Selector.SELECTOR_OP_ON_RESOURCE);
 		Property dpOffset = model.getProperty(OffsetRangeTextSelector.OFFSET_RANGE_TEXT_SELECTOR_DP_OFFSET);
@@ -69,7 +69,7 @@ public class OffsetRangeTextSelectorOWL implements SelectorDAO<OffsetRangeTextSe
 	 * @return
 	 * @throws URISyntaxException
 	 */
-	public Resource addSelector(OffsetRangeTextSelector selector, OntModel model) throws URISyntaxException {
+	public Resource addSelector(OffsetRangeTextSelector selector, OntModel model, String base) throws URISyntaxException {
 		// TODO Auto-generated method stub
 		return null;	
 	}

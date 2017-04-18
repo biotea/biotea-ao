@@ -71,7 +71,7 @@ public class AnnotationOWLReader {
 		    
 		    Resource annotRes = r.getPropertyResourceValue(opAnnotatesResource);
 		    FoafDocument annotDoc = new FoafDocument();
-		    annotDoc.setId(new URI(annotRes.getURI()));
+		    annotDoc.setUri(new URI(annotRes.getURI()));
 		    annot.setResource(annotDoc);
 		    StmtIterator stmItr = r.listProperties(opHasTopic);
 		    while (stmItr.hasNext()) {
