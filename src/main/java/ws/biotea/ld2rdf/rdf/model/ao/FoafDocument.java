@@ -12,13 +12,8 @@ import java.net.URI;
  */
 public class FoafDocument implements Serializable {
 	private static final long serialVersionUID = 1L;
-	/* Attributes */
-	/**
-	 * URI
-	 */
 	private URI uri;
-	/* OWL Descriptors */
-	//public final static String FOAF_CLASS = Namespace.FOAF_NS + ":Document";
+	private String id;
 	/**
 	 * Returns the id.
 	 * @return the id
@@ -26,12 +21,14 @@ public class FoafDocument implements Serializable {
 	public URI getUri() {
 		return uri;
 	}
-	/**
-	 * Sets the value for the id.
-	 * @param id the id to set
-	 */
-	public void setId(URI id) {
+	public void setUri(URI id) {
 		this.uri = id;
+	}
+	public String getId() {
+		return id;
+	}
+	public void setId(String id) {
+		this.id = id;
 	}
 	@Override
 	public String toString() {

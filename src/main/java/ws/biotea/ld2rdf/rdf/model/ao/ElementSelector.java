@@ -3,7 +3,7 @@ package ws.biotea.ld2rdf.rdf.model.ao;
 import ws.biotea.ld2rdf.util.ClassesAndProperties;
 import ws.biotea.ld2rdf.util.OntologyPrefix;
 
-public class ElementSelector extends Selector{
+public class ElementSelector extends Selector {
 	private static final long serialVersionUID = 1L;
 	private String elementURI;
 	private String text;

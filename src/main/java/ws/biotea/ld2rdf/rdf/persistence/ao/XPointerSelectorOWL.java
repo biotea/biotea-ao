@@ -47,14 +47,14 @@ public class XPointerSelectorOWL implements SelectorDAO<XPointerSelector>{
 	 * @return
 	 * @throws URISyntaxException
 	 */
-	public Resource addSelector(XPointerSelector xpointerSelector, OntModel model) throws URISyntaxException {
+	public Resource addSelector(XPointerSelector xpointerSelector, OntModel model, String base) throws URISyntaxException {
 		OntClass selectorClass = model.getOntClass(XPointerSelector.XPOINTER_SELECTOR_CLASS);
 		Property opOnDocument = model.getProperty(Selector.SELECTOR_OP_ON_RESOURCE);
 		Property dpXpointer = model.getProperty(XPointerSelector.XPOINTER_SELECTOR_DP_XPOINTER);
 		
 		//Selector
 		xpointerSelector.setId(new Date().getTime() + "");
-		String resourceURI = ResourceConfig.BIOTEA_URL + "XPointerSelector_" + xpointerSelector.getId();
+		String resourceURI = ResourceConfig.getBioteaURL(base) + "XPointerSelector_" + xpointerSelector.getId();
 		xpointerSelector.setUri(new URI(resourceURI));
 		Resource selectorRes = model.createIndividual(resourceURI, selectorClass);
 		//document
@@ -95,7 +95,7 @@ public class XPointerSelectorOWL implements SelectorDAO<XPointerSelector>{
 		// Important - free up resources used running the query
 		qe.close();
 	}
-	public Resource addSelector(XPointerSelector selector, Model model) throws URISyntaxException {
+	public Resource addSelector(XPointerSelector selector, Model model, String base, String baseURL, String documentID) throws URISyntaxException {
 		// TODO Auto-generated method stub
 		return null;
 	}
