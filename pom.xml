@@ -32,7 +32,11 @@
 		    <artifactId>biotea_utilities</artifactId>
 		    <version>1.0</version>
 		</dependency-->
-		
+		<dependency>
+			<groupId>biotea</groupId>
+			<artifactId>biotea_utilities</artifactId>
+			<version>1.0</version>
+		</dependency>
 		<dependency>
 		    <groupId>edu_stanford_protege</groupId>
 		    <artifactId>protege_owl</artifactId>

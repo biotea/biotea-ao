@@ -16,13 +16,13 @@ public class AnnotationDAOUtil {
 	public static AnnotationDAO getDAO(String base, ConstantConfig onto) {
 		AnnotationDAO dao = null;
 		if (onto == ConstantConfig.OA) {
-			if (ResourceConfig.getUseBio2RDF(base) || (ResourceConfig.getMappingFile().length() != 0)) {
+			if (ResourceConfig.getUseBio2RDF(base) || (ResourceConfig.getMappingFile("").length() != 0)) {
 				dao = new AnnotationMappingOWLOA();
 			} else {
 				dao = new AnnotationOWLOA();
 			}  			
 		} else {
-			if (ResourceConfig.getUseBio2RDF(base) || (ResourceConfig.getMappingFile().length() != 0)) {
+			if (ResourceConfig.getUseBio2RDF(base) || (ResourceConfig.getMappingFile("").length() != 0)) {
 				dao = new AnnotationMappingOWLDAO();
 			} else {
 				dao = new AnnotationOWLDAO();
